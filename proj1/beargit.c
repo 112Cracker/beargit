@@ -95,8 +95,11 @@ int beargit_add(const char* filename) {
 
 /* beargit status
  *
- * See "Step 1" in the homework 1 spec.
+ * - read the file .beargit/.index
+ * - print a line for each tracked file
  *
+ * Output (to stdout):
+ * - None if successful
  */
 
 int beargit_status() {
@@ -112,6 +115,7 @@ int beargit_status() {
     printf("<%s>\n", line);
   }
   printf("<%d> files total\n", count);
+  fclose(findex);
   return 0;
 }
 
