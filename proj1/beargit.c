@@ -119,6 +119,46 @@ int beargit_status() {
   return 0;
 }
 
+/*
+ * helper function for beargit_rm
+ */
+int is_same_filename(char *tracked_filename, const char *filename) {
+  int len1 = strlen(tracked_filename);
+  int len2 = strlen(filename);
+  int i;
+  if (len1 != len2) return 0;
+  for (i = 0; i < len1; i++) {
+    if (tracked_filename[i] != filename[i]) return 0;
+  }
+  return 1;
+}
+
+/*
+ * helper function for beargit_rm
+ */
+int rm_file_from_index(int delete_line) {
+  FILE *findex, *dupfile;
+  int curr_line = 0;
+
+  findex = fopen(".beargit/.index", "r");
+  dupfile = fopen(".beargit/.dupfile", "w");
+
+  char line[FILENAME_SIZE];
+  while(fgets(line, FILENAME_SIZE, findex)) {
+    strtok(line, "\n");
+    curr_line ++;
+    if (curr_line != delete_line) {
+      fputs(line, dupfile);
+    }
+  }
+  fclose(findex);
+  fclose(dupfile);
+  remove(".beargit/.index");
+  rename(".beargit/.dupfile", ".beargit/.index");
+
+  return(0);
+}
+
 /* beargit rm <filename>
  * 
  * - remove the File <filename> in the .beargit/.index
@@ -131,9 +171,25 @@ int beargit_status() {
  * - None if successful
  */
 
-int beargit_rm(const char* filename) {
+int beargit_rm(const char *filename) {
   /* COMPLETE THE REST */
+  FILE *findex = fopen(".beargit/.index", "r");
+  char line[FILENAME_SIZE];
+  int delete_line = 0, isFound = 0;
 
+  while(fgets(line, FILENAME_SIZE, findex)) {
+    strtok(line, "\n");
+    delete_line ++;
+    if (is_same_filename(line, filename)) {
+      isFound = 1;
+      fclose(findex);
+      rm_file_from_index(delete_line);
+    }
+  }
+
+  if (!isFound) {
+    fprintf(stderr, "The file <%s> is not being tracked\n", filename);
+  }
   return 0;
 }
 
