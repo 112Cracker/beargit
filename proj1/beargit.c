@@ -136,7 +136,7 @@ int is_same_filename(char *tracked_filename, const char *filename) {
 /*
  * helper function for beargit_rm
  */
-int rm_file_from_index(int delete_line) {
+int rm_line_from_index(int delete_line) {
   FILE *findex, *dupfile;
   int curr_line = 0;
 
@@ -183,7 +183,7 @@ int beargit_rm(const char *filename) {
     if (is_same_filename(line, filename)) {
       isFound = 1;
       fclose(findex);
-      rm_file_from_index(delete_line);
+      rm_line_from_index(delete_line);
     }
   }
 
