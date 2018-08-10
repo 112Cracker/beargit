@@ -121,8 +121,14 @@ int beargit_status() {
 
 /* beargit rm <filename>
  * 
- * See "Step 2" in the homework 1 spec.
+ * - remove the File <filename> in the .beargit/.index
+ * - print an error if the filename passed is not being tracked
  *
+ * Possible errors (to stderr):
+ * >> Error: File <filename> is not being tracked
+ *
+ * Output(to stdout):
+ * - None if successful
  */
 
 int beargit_rm(const char* filename) {
