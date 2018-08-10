@@ -67,7 +67,7 @@ int beargit_init(void) {
  */
 
 int beargit_add(const char* filename) {
-  FILE* findex = fopen(".beargit/.index", "r");
+  FILE *findex = fopen(".beargit/.index", "r");
   FILE *fnewindex = fopen(".beargit/.newindex", "w");
 
   char line[FILENAME_SIZE];
@@ -101,7 +101,17 @@ int beargit_add(const char* filename) {
 
 int beargit_status() {
   /* COMPLETE THE REST */
+  FILE *findex = fopen(".beargit/.index", "r");
+  char line[FILENAME_SIZE];
+  int count = 0;
 
+  printf("%s\n", "Tracked files:");
+  while(fgets(line, FILENAME_SIZE, findex)) {
+    count ++;
+    strtok(line, "\n");
+    printf("<%s>\n", line);
+  }
+  printf("<%d> files total\n", count);
   return 0;
 }
 
