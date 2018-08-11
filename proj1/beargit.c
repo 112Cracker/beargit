@@ -200,6 +200,9 @@ int beargit_rm(const char *filename) {
 
 const char* go_bears = "GO BEARS!";
 
+/*
+ * Helper function for is_commit_msg_ok
+ */
 int has_go_bears(char *msg_p, char *go_bears_p) {
   while (*go_bears_p != '\0') {
     if (*go_bears_p != *msg_p) {
@@ -211,6 +214,13 @@ int has_go_bears(char *msg_p, char *go_bears_p) {
   return(1);
 }
 
+/*
+ * Check if the commit message include 'GO BEARS!'
+ *
+ * Output;
+ * 1 if the commit message include 'GO BEARS'
+ * 0 if not
+ */
 int is_commit_msg_ok(const char* msg) {
   /* COMPLETE THE REST */
   char *p1 = msg, *p2 = go_bears;
@@ -225,7 +235,7 @@ int is_commit_msg_ok(const char* msg) {
 }
 
 /*
- * 
+ * Generate unique commit id(tag id)
  */
 void next_commit_id_part1(char* commit_id) {
   /* COMPLETE THE REST */
@@ -248,6 +258,9 @@ void next_commit_id_part1(char* commit_id) {
   }
 }
 
+/*
+ *
+ */
 int beargit_commit(const char* msg) {
   if (!is_commit_msg_ok(msg)) {
     fprintf(stderr, "ERROR: Message must contain \"%s\"\n", go_bears);
@@ -258,45 +271,37 @@ int beargit_commit(const char* msg) {
   read_string_from_file(".beargit/.prev", commit_id, COMMIT_ID_SIZE);
   next_commit_id(commit_id); 
   /* COMPLETE THE REST */
-  char new_dir[512] = ".beargit/";
-  strcat(new_dir, commit_id);
+  char *new_dir = malloc(strlen(".beargit/") + strlen(commit_id) + 1);
+  sprintf(new_dir, "%s/%s", ".beargit", commit_id);
   fs_mkdir(new_dir);
 
   // copy .beargit/.index to .beargit/<newid>
-  char copy_1[512];
-  strcpy(copy_1, new_dir);
-  FILE *findex = fopen(".beargit/.index", "r");
-  FILE *dest_index = fopen(strcat(copy_1, "/.index"), "w");
-  char line[FILENAME_SIZE];
-  while (fgets(line, FILENAME_SIZE, findex)) {
-    strtok(line, "\n");
-    fprintf(dest_index, "%s\n", line);
-  }
-  fclose(findex);
-  fclose(dest_index);
+  char *new_index = malloc(strlen(new_dir) + strlen("/.index") + 1);
+  sprintf(new_index, "%s/%s", new_dir, ".index");
+  fs_cp(".beargit/.index", new_index);
 
   // copy .beargit/.pre to .beargit/<newid>
-  char copy_2[512];
-  strcpy(copy_2, new_dir);
-  FILE *fprev = fopen(".beargit/.prev", "r+");
-  FILE *dest_prev = fopen(strcat(copy_2, "/.prev"), "w");
-  char id[COMMIT_ID_SIZE];
-  while (fgets(id, COMMIT_ID_SIZE, fprev)) {
-    strtok(id, "\n");
-    fprintf(dest_prev, "%s\n", id);
+  char *new_pre = malloc(strlen(new_dir) + strlen("/.prev") + 1);
+  sprintf(new_pre, "%s/%s", new_dir, ".prev");
+  fs_cp(".beargit/.prev", new_pre);
+
+  // copy all tracked files to .beagit/<newid>
+  FILE *pre = fopen(".beargit/.index", "r");
+  char line[FILENAME_SIZE];
+  while(fgets(line, FILENAME_SIZE, pre)) {
+    strtok(line, "\n");
+    char *new_file_dir = malloc(strlen(new_dir) + strlen("/")+ strlen(line) + 1);
+    sprintf(new_file_dir, "%s/%s", new_dir, line);
+    fs_cp(line, new_file_dir);
   }
+  fclose(pre); 
+
   // write the new ID into .beargit/.prev
-  fprintf(fprev, "%s\n", commit_id);
-  fclose(fprev);
-  fclose(dest_prev);
+  write_string_to_file(".beargit/.prev", commit_id);
   // store the commit message into .beargit/<newid>/.msg
-  char copy_3[512];
-  strcpy(copy_3, new_dir);
-  printf("%s\n", copy_3);
-  printf("%s\n", msg);
-  FILE *fmsg = fopen(strcat(copy_3, "/.msg"), "w");
-  fprintf(fmsg, "%s\n", msg);
-  fclose(fmsg);
+  char *msg_dir = malloc(strlen(new_dir) + strlen("/.msg") + 1);
+  sprintf(msg_dir, "%s/%s", new_dir, ".msg");
+  write_string_to_file(msg_dir, msg);
 
   return 0;
 }
