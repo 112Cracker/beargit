@@ -192,12 +192,9 @@ int beargit_rm(const char *filename) {
   return 0;
 }
 
-/* beargit commit -m <msg>
- *
- * See "Step 3" in the homework 1 spec.
- *
+/* beargit_commit -m <msg>
+ * 
  */
-
 const char* go_bears = "GO BEARS!";
 
 /*
@@ -256,9 +253,21 @@ void next_commit_id_part1(char* commit_id) {
       continue;
     } 
   }
-}
+} 
 
-/*
+ /*
+ * Check whether the commit string contains "GO BEARS!"
+ * Generate the next ID(newid)
+ * Generate a new directory .beargit/<newid>
+ * Copy .beargit/.index, .beargit/.prev and all tracked files into .beargit/<newid>
+ * Store the commit message <msg> into .beargit/<newid>/.msg
+ * Write the new ID into .beargit/.prev
+ * 
+ * Possible errors(to stderr)
+ * >> Error: Message must contain "GO BEARS!"
+ *
+ * Output(to stdout)
+ * - None of successful
  *
  */
 int beargit_commit(const char* msg) {
@@ -307,7 +316,11 @@ int beargit_commit(const char* msg) {
 }
 
 /*
- *
+ * Check if the commit_id is the initial commit
+ * 
+ * Output:
+ * return 1 if the commit_id is the initial commit
+ * return 0 if not
  */
 int is_no_commit(char *commit_id) {
   int i, len = strlen(commit_id);
@@ -319,10 +332,15 @@ int is_no_commit(char *commit_id) {
 
 /* beargit log
  *
- * See "Step 4" in the homework 1 spec.
+ * Print out either all or limit number of commits
+ *
+ * Possible errors (to stderr)
+ * >> Error: There are no commits!
+ *
+ * Output(to stdout)
+ * - None if successful 
  * 
  */
-
 int beargit_log(int limit) {
   /* COMPLETE THE REST */
   char new_commit[COMMIT_ID_SIZE];
@@ -331,7 +349,7 @@ int beargit_log(int limit) {
   int count = 0;
 
   if (is_no_commit(new_commit)) {
-    fprintf(stderr, "%s\n", "ERROR: There are no commits!");
+    fprintf(stderr, "%s\n", "There are no commits!");
   }
 
   while (!is_no_commit(commit_p) && count < limit) {
