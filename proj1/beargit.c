@@ -200,14 +200,36 @@ int beargit_rm(const char *filename) {
 
 const char* go_bears = "GO BEARS!";
 
+int has_go_bears(char *msg_p, char *go_bears_p) {
+  while (*go_bears_p != '\0') {
+    if (*go_bears_p != *msg_p) {
+      return(0);
+    }
+    msg_p ++;
+    go_bears_p ++;
+  }
+  return(1);
+}
+
 int is_commit_msg_ok(const char* msg) {
   /* COMPLETE THE REST */
+  char *p1 = msg, *p2 = go_bears;
+
+  while (*p1 != '\0') {
+    if (*p1 == 'G' && has_go_bears(p1, p2)) {
+      return(1);
+    }
+    p1 ++;
+  }
   return 0;
 }
 
+/*
+ * 
+ */
 void next_commit_id_part1(char* commit_id) {
   /* COMPLETE THE REST */
-  char *p = commit_id
+  char *p = commit_id;
   while(*p != '\0') {
     if (*p == '6') {
       *p = '1';
@@ -219,7 +241,7 @@ void next_commit_id_part1(char* commit_id) {
       *p = '6';
       p ++;
     } else if (*p == '0') {
-      *P = '6'
+      *p = '6';
       p ++;
       continue;
     } 
@@ -235,8 +257,45 @@ int beargit_commit(const char* msg) {
   char commit_id[COMMIT_ID_SIZE];
   read_string_from_file(".beargit/.prev", commit_id, COMMIT_ID_SIZE);
   next_commit_id(commit_id); 
-
   /* COMPLETE THE REST */
+  char new_dir[512] = ".beargit/";
+  strcat(new_dir, commit_id);
+  fs_mkdir(new_dir);
+
+  // copy .beargit/.index to .beargit/<newid>
+  char copy_1[512];
+  strcpy(copy_1, new_dir);
+  FILE *findex = fopen(".beargit/.index", "r");
+  FILE *dest_index = fopen(strcat(copy_1, "/.index"), "w");
+  char line[FILENAME_SIZE];
+  while (fgets(line, FILENAME_SIZE, findex)) {
+    strtok(line, "\n");
+    fprintf(dest_index, "%s\n", line);
+  }
+  fclose(findex);
+  fclose(dest_index);
+
+  // copy .beargit/.pre to .beargit/<newid>
+  char copy_2[512];
+  strcpy(copy_2, new_dir);
+  FILE *fprev = fopen(".beargit/.prev", "r+");
+  FILE *dest_prev = fopen(strcat(copy_2, "/.prev"), "w");
+  char id[COMMIT_ID_SIZE];
+  while (fgets(id, COMMIT_ID_SIZE, fprev)) {
+    strtok(id, "\n");
+    fprintf(dest_prev, "%s\n", id);
+  }
+  // write the new ID into .beargit/.prev
+  fprintf(fprev, "%s\n", commit_id);
+  fclose(fprev);
+  fclose(dest_prev);
+
+  // store the commit message into .beargit/<newid>/.msg
+  char copy_3[512];
+  strcpy(copy_3, new_dir)
+  FILE *fmsg = fopen(strcat(copy_3, "./msg"), "a");
+  fprintf(fmsg, "%s\n", msg);
+  fclose(fmsg);
 
   return 0;
 }
