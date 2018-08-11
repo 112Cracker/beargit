@@ -306,6 +306,17 @@ int beargit_commit(const char* msg) {
   return 0;
 }
 
+/*
+ *
+ */
+int is_no_commit(char *commit_id) {
+  int i, len = strlen(commit_id);
+  for (i = 0; i < len; i++) {
+    if (commit_id[i] != '0') return 0;
+  }
+  return 1;
+}
+
 /* beargit log
  *
  * See "Step 4" in the homework 1 spec.
@@ -314,6 +325,34 @@ int beargit_commit(const char* msg) {
 
 int beargit_log(int limit) {
   /* COMPLETE THE REST */
+  char new_commit[COMMIT_ID_SIZE];
+  char *commit_p = new_commit; // pointer to the current tracked commit
+  read_string_from_file(".beargit/.prev", new_commit, COMMIT_ID_SIZE);
+  int count = 0;
+
+  if (is_no_commit(new_commit)) {
+    fprintf(stderr, "%s\n", "ERROR: There are no commits!");
+  }
+
+  while (!is_no_commit(commit_p) && count < limit) {
+    // print commit<ID>
+    printf("commit<%s>\n", commit_p);
+
+    char *msg_dir = malloc(strlen(".beargit") + COMMIT_ID_SIZE + strlen("/.msg") + 1);
+    sprintf(msg_dir, "%s/%s/%s", ".beargit", commit_p, ".msg");
+    char msg[512];
+    read_string_from_file(msg_dir, msg, 512);
+    // print <msg>
+    printf("\t<%s>\n", msg);
+
+    // get last commit
+    char last_commit[COMMIT_ID_SIZE];
+    char *last_commit_dir = malloc(strlen(".beargit/") + COMMIT_ID_SIZE + 1);
+    sprintf(last_commit_dir, "%s/%s/.prev", ".beargit", commit_p);
+    read_string_from_file(last_commit_dir, last_commit, COMMIT_ID_SIZE);
+    // update 
+    commit_p = last_commit;
+  }
   return 0;
 }
 
