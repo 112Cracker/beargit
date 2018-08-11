@@ -289,11 +289,12 @@ int beargit_commit(const char* msg) {
   fprintf(fprev, "%s\n", commit_id);
   fclose(fprev);
   fclose(dest_prev);
-
   // store the commit message into .beargit/<newid>/.msg
   char copy_3[512];
-  strcpy(copy_3, new_dir)
-  FILE *fmsg = fopen(strcat(copy_3, "./msg"), "a");
+  strcpy(copy_3, new_dir);
+  printf("%s\n", copy_3);
+  printf("%s\n", msg);
+  FILE *fmsg = fopen(strcat(copy_3, "/.msg"), "w");
   fprintf(fmsg, "%s\n", msg);
   fclose(fmsg);
 
