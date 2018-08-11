@@ -170,7 +170,6 @@ int rm_line_from_index(int delete_line) {
  * Output(to stdout):
  * - None if successful
  */
-
 int beargit_rm(const char *filename) {
   /* COMPLETE THE REST */
   FILE *findex = fopen(".beargit/.index", "r");
@@ -208,6 +207,23 @@ int is_commit_msg_ok(const char* msg) {
 
 void next_commit_id_part1(char* commit_id) {
   /* COMPLETE THE REST */
+  char *p = commit_id
+  while(*p != '\0') {
+    if (*p == '6') {
+      *p = '1';
+      break;
+    } else if (*p == '1') {
+      *p = 'c';
+      break;
+    } else if (*p == 'c') {
+      *p = '6';
+      p ++;
+    } else if (*p == '0') {
+      *P = '6'
+      p ++;
+      continue;
+    } 
+  }
 }
 
 int beargit_commit(const char* msg) {
@@ -254,7 +270,7 @@ void next_commit_id(char* commit_id) {
   }
 
   // Use next_commit_id to fill in the rest of the commit ID.
-  next_commit_id_part1(commit_id + COMMIT_ID_BRANCH_BYTES);
+  next_commit_id_part1(commit_id + COMMIT_ID_BRANCH_BYTES); // pointer arithmatic
 }
 
 
