@@ -325,7 +325,9 @@ int beargit_commit(const char* msg) {
 int is_no_commit(char *commit_id) {
   int i, len = strlen(commit_id);
   for (i = 0; i < len; i++) {
-    if (commit_id[i] != '0') return 0;
+    if (commit_id[i] != '0') {
+      return 0;
+    }
   }
   return 1;
 }
@@ -374,7 +376,6 @@ int beargit_log(int limit) {
   return 0;
 }
 
-
 const char* digits = "61c";
 
 void next_commit_id(char* commit_id) {
@@ -422,7 +423,6 @@ int get_branch_number(const char* branch_name) {
  * See "Step 5" in the homework 1 spec.
  *
  */
-
 int beargit_branch() {
   /* COMPLETE THE REST */
   char *curr_branch = malloc(BRANCHNAME_SIZE);
@@ -443,10 +443,18 @@ int beargit_branch() {
 
 /* beargit checkout
  *
- * See "Step 6" in the homework 1 spec.
+ * beargit checkout <commit_id> checkout a given commit
+ * beargit checkout <branch> check out an existing branch and check out its head
+ * beargit checkout -b <newbranch> start a new branch at the current commit
  *
  */
 
+/*
+ * Replace the currently tracked files with files from the time of the commit
+ *
+ * Output
+ * None if successful
+ */
 int checkout_commit(const char* commit_id) {
   /* COMPLETE THE REST */
   FILE *findex = fopen(".beargit/.index", "w");
@@ -474,7 +482,6 @@ int checkout_commit(const char* commit_id) {
  */
 int is_it_a_commit_id(const char* commit_id) {
   /* COMPLETE THE REST */
-  printf("%s\n", "Enter is it a commit id");
   char latest_commit[COMMIT_ID_SIZE];
   char *commit_pointer = latest_commit; // pointer to the current tracked commit
   read_string_from_file(".beargit/.prev", latest_commit, COMMIT_ID_SIZE);
@@ -482,18 +489,20 @@ int is_it_a_commit_id(const char* commit_id) {
   if (strcmp(commit_pointer, commit_id) == 0) {
     return 1;
   }
-  printf("%s\n", "Pass the first task2");
+
   while (!is_no_commit(commit_pointer)) {
-    printf("%s\n", "In loop");
     // get last commit
     char before_commit[COMMIT_ID_SIZE];
-    commit_pointer = before_commit;
     char *before_commit_dir = malloc(strlen(".beargit/") + COMMIT_ID_SIZE + 1);
     sprintf(before_commit_dir, "%s/%s/.prev", ".beargit", commit_pointer);
     read_string_from_file(before_commit_dir, before_commit, COMMIT_ID_SIZE);
-
     if (strcmp(before_commit, commit_id) == 0) {
       return 1;
+    }
+    commit_pointer = before_commit;
+    printf("%s\n", commit_pointer);
+    if (is_no_commit(commit_pointer)) {
+      break;
     }
   }
   return 0;
@@ -501,20 +510,17 @@ int is_it_a_commit_id(const char* commit_id) {
 
 int beargit_checkout(const char* arg, int new_branch) {
   // Get the current branch
-  printf("%s\n", "Enter beargit_checkout");
   char current_branch[BRANCHNAME_SIZE];
   read_string_from_file(".beargit/.current_branch", current_branch, BRANCHNAME_SIZE);
 
   // If not detached, update the current branch by storing the current HEAD into that branch's file...
   // Even if we cancel later, this is still ok.
-  printf("%s\n", "Pass the first task");
   if (strlen(current_branch)) {
     char current_branch_file[BRANCHNAME_SIZE+50];
     sprintf(current_branch_file, ".beargit/.branch_%s", current_branch);
     fs_cp(".beargit/.prev", current_branch_file);
   }
 
-  printf("%s\n", "Pass the second task");
   // Check whether the argument is a commit ID. If yes, we just stay in detached mode
   // without actually having to change into any other branch.
   if (is_it_a_commit_id(arg)) {
@@ -530,6 +536,9 @@ int beargit_checkout(const char* arg, int new_branch) {
     write_string_to_file(".beargit/.current_branch", "");
 
     return checkout_commit(arg);
+  } else {
+    fprintf(stderr, "<%s> %s\n", commit_id, "does not exist");
+    return(0);
   }
 
   // Just a better name, since we now know the argument is a branch name.
