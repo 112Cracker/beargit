@@ -447,17 +447,19 @@ int beargit_branch() {
  *
  */
 
-void replace_curr_tracked_files(const char *commit_id) {
-
-}
-
 int checkout_commit(const char* commit_id) {
   /* COMPLETE THE REST */
   FILE *findex = fopen(".beargit/.index", "w");
   char *commit_f_dir = malloc(strlen(".beargit/") + strlen(commit_id) + strlen("/.index") + 1);
   sprintf(commit_f_dir, "%s/%s/%s", ".beargit", commit_id, ".index");
 
-  FILE *fcommit = fopen(commit_f_dir)
+  FILE *fcommit = fopen(commit_f_dir, "r")
+
+  char line[FILENAME_SIZE];
+  while (fgets(line, FILENAME_SIZE, fcommit)) {
+    strtok(line, "\n");
+    fprintf(findex, "%s\n", line);
+  }
   return 0;
 }
 
