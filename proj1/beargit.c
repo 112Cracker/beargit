@@ -453,7 +453,7 @@ int checkout_commit(const char* commit_id) {
   char *commit_f_dir = malloc(strlen(".beargit/") + strlen(commit_id) + strlen("/.index") + 1);
   sprintf(commit_f_dir, "%s/%s/%s", ".beargit", commit_id, ".index");
 
-  FILE *fcommit = fopen(commit_f_dir, "r")
+  FILE *fcommit = fopen(commit_f_dir, "r");
 
   char line[FILENAME_SIZE];
   while (fgets(line, FILENAME_SIZE, fcommit)) {
@@ -463,6 +463,13 @@ int checkout_commit(const char* commit_id) {
   return 0;
 }
 
+/*
+ * Check whether commit_id exists
+ *
+ * Output
+ * return 1 if the commit_id exist
+ * return 0 if not
+ */
 int is_it_a_commit_id(const char* commit_id) {
   /* COMPLETE THE REST */
   char new_commit[COMMIT_ID_SIZE];
@@ -491,17 +498,20 @@ int is_it_a_commit_id(const char* commit_id) {
 
 int beargit_checkout(const char* arg, int new_branch) {
   // Get the current branch
+  printf("%s\n", "Enter beargit_checkout");
   char current_branch[BRANCHNAME_SIZE];
   read_string_from_file(".beargit/.current_branch", current_branch, BRANCHNAME_SIZE);
 
   // If not detached, update the current branch by storing the current HEAD into that branch's file...
   // Even if we cancel later, this is still ok.
+  printf("%s\n", "Pass the first task");
   if (strlen(current_branch)) {
     char current_branch_file[BRANCHNAME_SIZE+50];
     sprintf(current_branch_file, ".beargit/.branch_%s", current_branch);
     fs_cp(".beargit/.prev", current_branch_file);
   }
 
+  printf("%s\n", "Pass the second task");
   // Check whether the argument is a commit ID. If yes, we just stay in detached mode
   // without actually having to change into any other branch.
   if (is_it_a_commit_id(arg)) {
