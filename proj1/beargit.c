@@ -460,6 +460,8 @@ int checkout_commit(const char* commit_id) {
     strtok(line, "\n");
     fprintf(findex, "%s\n", line);
   }
+  fclose(findex);
+  fclose(fcommit);
   return 0;
 }
 
@@ -472,26 +474,27 @@ int checkout_commit(const char* commit_id) {
  */
 int is_it_a_commit_id(const char* commit_id) {
   /* COMPLETE THE REST */
-  char new_commit[COMMIT_ID_SIZE];
-  char *commit_p = new_commit; // pointer to the current tracked commit
-  read_string_from_file(".beargit/.prev", new_commit, COMMIT_ID_SIZE);
+  printf("%s\n", "Enter is it a commit id");
+  char latest_commit[COMMIT_ID_SIZE];
+  char *commit_pointer = latest_commit; // pointer to the current tracked commit
+  read_string_from_file(".beargit/.prev", latest_commit, COMMIT_ID_SIZE);
 
-  if (strcmp(commit_p, commit_id) == 0) {
+  if (strcmp(commit_pointer, commit_id) == 0) {
     return 1;
   }
-
-  while (!is_no_commit(commit_p)) {
+  printf("%s\n", "Pass the first task2");
+  while (!is_no_commit(commit_pointer)) {
+    printf("%s\n", "In loop");
     // get last commit
-    char last_commit[COMMIT_ID_SIZE];
-    char *last_commit_dir = malloc(strlen(".beargit/") + COMMIT_ID_SIZE + 1);
-    sprintf(last_commit_dir, "%s/%s/.prev", ".beargit", commit_p);
-    read_string_from_file(last_commit_dir, last_commit, COMMIT_ID_SIZE);
+    char before_commit[COMMIT_ID_SIZE];
+    commit_pointer = before_commit;
+    char *before_commit_dir = malloc(strlen(".beargit/") + COMMIT_ID_SIZE + 1);
+    sprintf(before_commit_dir, "%s/%s/.prev", ".beargit", commit_pointer);
+    read_string_from_file(before_commit_dir, before_commit, COMMIT_ID_SIZE);
 
-    if (strcmp(last_commit, commit_id) == 0) {
+    if (strcmp(before_commit, commit_id) == 0) {
       return 1;
     }
-    // update 
-    commit_p = last_commit;
   }
   return 0;
 }
