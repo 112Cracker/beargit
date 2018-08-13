@@ -447,20 +447,50 @@ int beargit_branch() {
  *
  */
 
+void replace_curr_tracked_files(const char *commit_id) {
+
+}
+
 int checkout_commit(const char* commit_id) {
   /* COMPLETE THE REST */
+  FILE *findex = fopen(".beargit/.index", "w");
+  char *commit_f_dir = malloc(strlen(".beargit/") + strlen(commit_id) + strlen("/.index") + 1);
+  sprintf(commit_f_dir, "%s/%s/%s", ".beargit", commit_id, ".index");
+
+  FILE *fcommit = fopen(commit_f_dir)
   return 0;
 }
 
 int is_it_a_commit_id(const char* commit_id) {
   /* COMPLETE THE REST */
-  return 1;
+  char new_commit[COMMIT_ID_SIZE];
+  char *commit_p = new_commit; // pointer to the current tracked commit
+  read_string_from_file(".beargit/.prev", new_commit, COMMIT_ID_SIZE);
+
+  if (strcmp(commit_p, commit_id) == 0) {
+    return 1;
+  }
+
+  while (!is_no_commit(commit_p)) {
+    // get last commit
+    char last_commit[COMMIT_ID_SIZE];
+    char *last_commit_dir = malloc(strlen(".beargit/") + COMMIT_ID_SIZE + 1);
+    sprintf(last_commit_dir, "%s/%s/.prev", ".beargit", commit_p);
+    read_string_from_file(last_commit_dir, last_commit, COMMIT_ID_SIZE);
+
+    if (strcmp(last_commit, commit_id) == 0) {
+      return 1;
+    }
+    // update 
+    commit_p = last_commit;
+  }
+  return 0;
 }
 
 int beargit_checkout(const char* arg, int new_branch) {
   // Get the current branch
   char current_branch[BRANCHNAME_SIZE];
-  read_string_from_file(".beargit/.current_branch", "current_branch", BRANCHNAME_SIZE);
+  read_string_from_file(".beargit/.current_branch", current_branch, BRANCHNAME_SIZE);
 
   // If not detached, update the current branch by storing the current HEAD into that branch's file...
   // Even if we cancel later, this is still ok.
@@ -473,6 +503,7 @@ int beargit_checkout(const char* arg, int new_branch) {
   // Check whether the argument is a commit ID. If yes, we just stay in detached mode
   // without actually having to change into any other branch.
   if (is_it_a_commit_id(arg)) {
+    printf("%s\n", arg);
     char commit_dir[FILENAME_SIZE] = ".beargit/";
     strcat(commit_dir, arg);
     if (!fs_check_dir_exists(commit_dir)) {
