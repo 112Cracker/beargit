@@ -425,7 +425,19 @@ int get_branch_number(const char* branch_name) {
 
 int beargit_branch() {
   /* COMPLETE THE REST */
+  char *curr_branch = malloc(BRANCHNAME_SIZE);
+  read_string_from_file(".beargit/.current_branch", curr_branch, BRANCHNAME_SIZE);
 
+  FILE *fbranches = fopen(".beargit/.branches", "r");
+  char line[BRANCHNAME_SIZE];
+  while(fgets(line, BRANCHNAME_SIZE, fbranches)) {
+    strtok(line, "\n");
+    if (strcmp(line, curr_branch) == 0) {
+      printf("*<%s>\n", line);
+    } else {
+      printf("<%s>\n", line);
+    }
+  }
   return 0;
 }
 
